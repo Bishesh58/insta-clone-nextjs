@@ -2,67 +2,67 @@ import { useRecoilState } from 'recoil'
 import { modalState } from '../atoms/modalAtoms'
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment, useRef, useState } from 'react'
-import { CameraIcon } from "@heroicons/react/outline";
+import { CameraIcon } from '@heroicons/react/outline'
 import {
-    collection,
-    addDoc,
-    serverTimestamp,
-    updateDoc,
-    doc,
-  } from "firebase/firestore"
- 
-// import { db, storage } from "../firebase";
+  collection,
+  addDoc,
+  serverTimestamp,
+  updateDoc,
+  doc,
+} from 'firebase/firestore'
 
-  import { useSession } from "next-auth/react";
-  import { ref, getDownloadURL, uploadString } from "@firebase/storage";
+import { db, storage } from '../firebase'
 
+import { useSession } from 'next-auth/react'
+import { ref, getDownloadURL, uploadString } from '@firebase/storage'
 
 export default function Modal() {
+  const { data: session } = useSession()
   const [open, setOpen] = useRecoilState(modalState)
-  const filePickerRef = useRef(null);
-  const [loading, setLoading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const captionRef = useRef(null);
+  const [loading, setLoading] = useState(false)
+  const [selectedFile, setSelectedFile] = useState(null)
+  const captionRef = useRef(null)
+  const filePickerRef = useRef(null)
 
   const uploadPost = async () => {
-    if (loading) return;
+    if (loading) return
 
-    setLoading(true);
-    const docRef = await addDoc(collection(db, "posts"), {
+    setLoading(true)
+    const docRef = await addDoc(collection(db, 'posts'), {
       username: session.user.username,
       caption: captionRef.current.value,
       profileImg: session.user.image,
       timestamp: serverTimestamp(),
-    });
+    })
 
-    console.log("New doc added with ID", docRef.id);
+    console.log('New doc added with ID', docRef.id)
 
-    const imageRef = ref(storage, `posts/${docRef.id}/image`);
+    const imageRef = ref(storage, `posts/${docRef.id}/image`)
 
-    await uploadString(imageRef, selectedFile, "data_url").then(
+    await uploadString(imageRef, selectedFile, 'data_url').then(
       async (snapshot) => {
-        const downloadURL = await getDownloadURL(imageRef);
-        await updateDoc(doc(db, "posts", docRef.id), {
+        const downloadURL = await getDownloadURL(imageRef)
+        await updateDoc(doc(db, 'posts', docRef.id), {
           image: downloadURL,
-        });
+        })
       }
-    );
+    )
 
-    setOpen(false);
-    setLoading(false);
-    setSelectedFile(null);
-  };
+    setOpen(false)
+    setLoading(false)
+    setSelectedFile(null)
+  }
 
   const addImageToPost = (e) => {
-    const reader = new FileReader();
+    const reader = new FileReader()
     if (e.target.files[0]) {
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(e.target.files[0])
     }
 
     reader.onload = (readerEvent) => {
-      setSelectedFile(readerEvent.target.result);
-    };
-  };
+      setSelectedFile(readerEvent.target.result)
+    }
+  }
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -75,27 +75,30 @@ export default function Modal() {
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
-            enterFrom="opacity-100"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
             leave="ease-in duration-200"
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity " />
+            <Dialog.Overlay className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
           </Transition.Child>
+
+          {/* This element is to trick the browser into centering the modal contents. */}
           <span
             className="hidden sm:inline-block sm:h-screen sm:align-middle"
             aria-hidden="true"
           >
-            &#8203
+            &#8203;
           </span>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
-            enterFrom="opacity-100 translate-y-0 sm:translate-y-0 sm: scale-95 "
+            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             enterTo="opacity-100 translate-y-0 sm:scale-100"
             leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
+            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div className="inline-block transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6 sm:align-middle">
               <div>
@@ -138,6 +141,7 @@ export default function Modal() {
                     <input
                       className="w-full border-none text-center focus:ring-0"
                       type="text"
+                      ref={captionRef}
                       placeholder="Please enter a caption..."
                     />
                   </div>
