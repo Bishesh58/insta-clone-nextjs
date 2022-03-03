@@ -6,8 +6,12 @@ import {
   PaperAirplaneIcon,
   BookmarkIcon,
 } from '@heroicons/react/outline'
+import { useSession } from 'next-auth/react'
 
 function Post({ id, username, userImg, img, caption }) {
+  
+  const {data: session} = useSession()
+  
   return (
     <div className="my-7 rounded-sm border bg-white">
       {/* Header  */}
@@ -22,14 +26,17 @@ function Post({ id, username, userImg, img, caption }) {
       </div>
       <img src={img} className="w-full object-cover" alt="" />
       {/* buttons */}
-      <div className="flex justify-between px-4 pt-4">
-        <div className="flex space-x-4">
-          <HeartIcon className="btn" />
-          <ChatIcon className="btn" />
-          <PaperAirplaneIcon className="btn" />
+      {session && (
+        <div className="flex justify-between px-4 pt-4">
+          <div className="flex space-x-4">
+            <HeartIcon className="btn" />
+            <ChatIcon className="btn" />
+            <PaperAirplaneIcon className="btn" />
+          </div>
+          <BookmarkIcon className="btn" />
         </div>
-        <BookmarkIcon className="btn" />
-      </div>
+      )}
+
       {/* caption */}
       <p className="truncate p-5">
         <span className="mr-1 font-bold">{username} </span>
@@ -37,12 +44,16 @@ function Post({ id, username, userImg, img, caption }) {
       </p>
       {/* comments */}
       {/* inputbox */}
-      <form className='flex items-center p-4'>
+      {session && (
+        <form className="flex items-center p-4">
           <EmojiHappyIcon className="h-7" />
-          <input type="text" className='border-none focus:ring-0 outline-none flex-1' />
-          <button className='font-semibold text-blue-400'>Post</button>
-
-      </form>
+          <input
+            type="text"
+            className="flex-1 border-none outline-none focus:ring-0"
+          />
+          <button className="font-semibold text-blue-400">Post</button>
+        </form>
+      )}
     </div>
   )
 }
