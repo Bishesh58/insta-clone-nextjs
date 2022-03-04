@@ -10,7 +10,7 @@ export default NextAuth({
     }),
     // ...add more providers here
   ],
-  secret="AUQJvDqSfFNotbBg/pAw0jOWnMWCAMRpIwsYSjSV6rM=",
+  secret:"AUQJvDqSfFNotbBg/pAw0jOWnMWCAMRpIwsYSjSV6rM=",
   //customize default login screen
   //   theme:{
   //       logo:"https://links.papareact.com/sq0",
