@@ -10,6 +10,7 @@ export default NextAuth({
     }),
     // ...add more providers here
   ],
+  
   //customize default login screen
   //   theme:{
   //       logo:"https://links.papareact.com/sq0",
